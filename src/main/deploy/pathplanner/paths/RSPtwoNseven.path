@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.9815751939196202,
+        "y": 2.8416795295129047
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.576581153162308,
+        "y": 0.18747191340536684
+      },
+      "isLocked": false,
+      "linkedName": "Random Spot 2"
+    },
+    {
+      "anchor": {
+        "x": 8.289990426134699,
+        "y": 2.4371348742697485
+      },
+      "prevControl": {
+        "x": 6.504073777378325,
+        "y": 2.8614134151345225
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Note Position 7"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Random Spot to Note",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

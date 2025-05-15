@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.698068368146915,
+        "y": 4.250869774004179
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.7143634776602106,
+        "y": 4.31993837367984
+      },
+      "isLocked": false,
+      "linkedName": "Speaker Position 3"
+    },
+    {
+      "anchor": {
+        "x": 2.912506594243959,
+        "y": 5.525086266457521
+      },
+      "prevControl": {
+        "x": 1.185791602352437,
+        "y": 5.811227607970974
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Note Position 2"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Speaker to notes paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

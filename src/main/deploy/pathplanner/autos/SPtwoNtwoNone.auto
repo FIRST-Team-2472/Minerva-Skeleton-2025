@@ -1,0 +1,87 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "angle to speaker"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "SPtwoNtwo"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "runIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NtwoRSPthree"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoShoot"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "runIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "RSPthreeNone"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NoneRSPthree"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "autoShoot"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "3 Note Autos",
+  "choreoAuto": false
+}
