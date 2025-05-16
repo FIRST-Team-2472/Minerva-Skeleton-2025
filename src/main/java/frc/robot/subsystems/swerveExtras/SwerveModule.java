@@ -1,14 +1,15 @@
 package frc.robot.subsystems.swerveExtras;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import com.ctre.phoenix6.hardware.CANcoder;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -19,103 +20,78 @@ import frc.robot.Constants.ModuleConstants;
 
 public class SwerveModule {
     
-    private final CANSparkMax driveMotor;
-    private final CANSparkMax turningMotor;
-
-    private final RelativeEncoder driveEncoder;
-    private final RelativeEncoder turningEncoder;
-
-    private final SparkMaxPIDController turningPidController;
+    private final SparkMax driveMotor;
+    private final SparkMax turningMotor;
 
     private CANcoder absoluteEncoder;
     private final boolean absoluteEncoderReversed;
     private final double absoluteEncoderoffset;
+    private final PIDController turningPidController;
 
     public SwerveModule(int driveMotorId, int turningMotorId, boolean driveMotorReversed, boolean turningMotorReversed, 
             int absoluteEncoderId, double absoluteEncoderoffset, boolean absoluteEncoderReversed){
         this.absoluteEncoderoffset = absoluteEncoderoffset;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
+        
         absoluteEncoder = new CANcoder(absoluteEncoderId);
-        CANcoderConfiguration config = new CANcoderConfiguration();
-        config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
-        config.MagnetSensor.MagnetOffset = -absoluteEncoderoffset;
-        absoluteEncoder.getConfigurator().apply(config);
 
-        driveMotor = new CANSparkMax(driveMotorId, MotorType.kBrushless);
-        turningMotor = new CANSparkMax(turningMotorId, MotorType.kBrushless);
+        driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
+        turningMotor = new SparkMax(turningMotorId, MotorType.kBrushless);
 
-        driveMotor.restoreFactoryDefaults();
-        turningMotor.restoreFactoryDefaults();
-
-        driveMotor.setInverted(driveMotorReversed);
-        turningMotor.setInverted(turningMotorReversed);
-
-        driveEncoder = driveMotor.getEncoder();
-        turningEncoder = turningMotor.getEncoder();
-
-        driveEncoder.setPositionConversionFactor(ModuleConstants.kDriveEncoderRot2Meter);
-        driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveEncoderRPM2MeterPerSec);
-        turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad); 
-        turningEncoder.setVelocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec);        
-
-
-        turningPidController = turningMotor.getPIDController();
-        turningPidController.setP(ModuleConstants.kPTurning);
-        turningPidController.setPositionPIDWrappingMinInput(-Math.PI);
-        turningPidController.setPositionPIDWrappingMaxInput(Math.PI);
-        turningPidController.setPositionPIDWrappingEnabled(true);
-        turningPidController.setFeedbackDevice(turningEncoder);
-
-        driveMotor.setIdleMode(com.revrobotics.CANSparkBase.IdleMode.kBrake);
-        turningMotor.setIdleMode(com.revrobotics.CANSparkBase.IdleMode.kBrake);
-        // turningPidController = new PIDController(ModuleConstants.kPTurning, 0, 0);
-        // turningPidController.enableContinuousInput(-Math.PI, Math.PI);
+        SparkMaxConfig sparkConfig = new SparkMaxConfig();
+        sparkConfig.smartCurrentLimit(35);
+        sparkConfig.idleMode(IdleMode.kBrake); //they didnt move on brake mode, we also dont really need it on that mode
+        driveMotor.configure(sparkConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        turningMotor.configure(sparkConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        
+        // lets us use a PID system for the turning motor
+        turningPidController = new PIDController(ModuleConstants.kPTurning, 0, 0);
+        // tells the PID controller that our motor can go from -PI to PI (it can rotate
+        // continously)
+        turningPidController.enableContinuousInput(-Math.PI, Math.PI);
         
         resetEncoders();
     }
     
 
     public double getDrivePosition(){
-        return driveEncoder.getPosition();
+        return driveMotor.getEncoder().getPosition() * ModuleConstants.kDriveEncoderRot2Meter;
     }
 
     public double getTurningPosition(){
-        return turningEncoder.getPosition();
+        return turningMotor.getEncoder().getPosition() * ModuleConstants.kTurningEncoderRot2Rad;
     }
 
     public double getDriveVelocity(){
-        return driveEncoder.getVelocity();
+        return driveMotor.getEncoder().getVelocity() * ModuleConstants.kDriveEncoderRPM2MeterPerSec;
     }
 
     public double getTurningVelocity(){
-        return turningEncoder.getVelocity();
+        return turningMotor.getEncoder().getVelocity() * ModuleConstants.kTurningEncoderRPM2RadPerSec;
     }
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(getDrivePosition(), new Rotation2d(getAbsolutePosition()));
+        return new SwerveModulePosition(getDrivePosition(), Rotation2d.fromDegrees(getAbsolutePosition()));
     }
     public double getAbsoluteEncoder(){ // this is used for shuffleboard
-        return absoluteEncoder.getAbsolutePosition().getValue();
+        return absoluteEncoder.getAbsolutePosition().getValueAsDouble();
     }
     public double getUnfilteredPosition(){
-        double angle = absoluteEncoder.getAbsolutePosition().getValue();
+        double angle = absoluteEncoder.getAbsolutePosition().getValueAsDouble();
         return angle;
     }
     public double getAbsolutePosition() {
-        // converts from 0-360 to -PI to PI then applies abosluteEncoder offset and
-        // reverse
-        double angle = Units.degreesToRadians(absoluteEncoder.getAbsolutePosition().getValue());
-        // angle -= absoluteEncoderoffset;
+        // converts from (-.5, .5) to (-180, 180)
+        double angle = 360 * absoluteEncoder.getAbsolutePosition().getValueAsDouble();
+        angle -= absoluteEncoderOffset;
         angle *= absoluteEncoderReversed ? -1 : 1;
-        angle *= 360;
-        // atan2 funtion range in -PI to PI, so it automaticaly converts (needs the sin
-        // and cos to) any input angle to that range
-        return Math.atan2(Math.sin(angle), Math.cos(angle));
+        
+        return angle;
     }
     
 
     public void resetEncoders(){
-        driveEncoder.setPosition(0);
-        turningEncoder.setPosition(getAbsolutePosition());
+        driveMotor.getEncoder().setPosition(0);
+        turningMotor.getEncoder().setPosition(getAbsolutePosition());
     }
 
     public SwerveModuleState getState(){
@@ -129,8 +105,7 @@ public class SwerveModule {
         }
         state = SwerveModuleState.optimize(state, getState().angle); // makes it so we can reverse the wheels instead of spinning 180
         driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-        turningMotor.getPIDController().setReference(state.angle.getRadians(), CANSparkMax.ControlType.kPosition);
-        // turningMotor.set(turningPidController.calculate(getTurningPosition(), state.angle.getRadians()));
+        turningMotor.set(turningPidController.calculate(getState().angle.getRadians(), state.angle.getRadians()));
     }
 
     public void stop(){

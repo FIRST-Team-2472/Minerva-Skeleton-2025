@@ -1,7 +1,11 @@
 package frc.robot.subsystems.ArmSubsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -9,18 +13,20 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmMotorsConstants.*;
 
 public class ShootingMotorSubsystem extends SubsystemBase {
-    private static CANSparkMax shooterTopMotor = new CANSparkMax(ShooterMotors.kTopShooterMotorId, MotorType.kBrushless);
-    private CANSparkMax shooterBottomMotor = new CANSparkMax(ShooterMotors.kBottomShooterMotorId, MotorType.kBrushless);
+    private static SparkMax shooterTopMotor = new SparkMax(ShooterMotors.kTopShooterMotorId, MotorType.kBrushless);
+    private SparkMax shooterBottomMotor = new SparkMax(ShooterMotors.kBottomShooterMotorId, MotorType.kBrushless);
     private PIDController shooterPID = new PIDController(0.5, 0.2, 0);
     public boolean constantAim;
 
     public ShootingMotorSubsystem() {
 
         // make sure all of them have the same settings in case we grabbed one with presets
-        shooterTopMotor.restoreFactoryDefaults();
-        shooterBottomMotor.restoreFactoryDefaults();
-        shooterBottomMotor.setSmartCurrentLimit(39);
-        shooterTopMotor.setSmartCurrentLimit(39);
+        SparkMaxConfig config = new SparkMaxConfig();
+            config.smartCurrentLimit(35);
+            config.idleMode(IdleMode.kCoast);
+        shooterBottomMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        shooterTopMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        
         constantAim = false;
 
     }

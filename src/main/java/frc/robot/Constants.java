@@ -1,9 +1,5 @@
 package frc.robot;
 
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -121,20 +117,6 @@ public final class Constants {
     public static final double MAX_MODULE_SPEED = 4.5;
     public static final double DRIVE_BASE_RADIUS_METERS = Math.hypot(DriveConstants.kTrackWidth,
         DriveConstants.kWheelBase) / 2;
-
-    public static final HolonomicPathFollowerConfig HOLONOMIC_PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
-        new PIDConstants(
-            TRANSLATION_KP,
-            TRANSLATION_KI,
-            TRANSLATION_KD), // Translation PID constants
-        new PIDConstants(
-            ROTATION_KP,
-            ROTATION_KI,
-            ROTATION_KD), // Rotation PID constants
-        MAX_MODULE_SPEED, // Max module speed, in m/s
-        DRIVE_BASE_RADIUS_METERS, // Drive base radius in meters. Distance from robot center to furthest module.
-        new ReplanningConfig() // Default path replanning config. See the API for the options here
-    );
   }
 
   public static class ArmMotorsConstants {

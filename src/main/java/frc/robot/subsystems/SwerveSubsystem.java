@@ -140,7 +140,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public double getHeading() {
-        return gyro.getYaw().getValue();
+        return gyro.getYaw().getValueAsDouble();
     }
 
     public boolean isAtPoint(Translation2d targetDrivePos) {

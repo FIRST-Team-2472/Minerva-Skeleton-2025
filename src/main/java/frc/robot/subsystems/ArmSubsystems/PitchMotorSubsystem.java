@@ -1,8 +1,11 @@
 package frc.robot.subsystems.ArmSubsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkBase.SoftLimitDirection;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
@@ -17,7 +20,7 @@ import frc.robot.Constants.ArmMotorsConstants.*;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class PitchMotorSubsystem extends SubsystemBase {
-    private CANSparkMax pitchMotor = new CANSparkMax(PitchMotor.kPitchMotorId, MotorType.kBrushless);
+    private SparkMax pitchMotor = new SparkMax(PitchMotor.kPitchMotorId, MotorType.kBrushless);
     private PIDController pitchPIDController = new PIDController(PitchMotor.kPitchMotorKP, 0, 0);
     private PIDController fasterPitchPIDController = new PIDController(.1, 0.1, 0);
     public AnalogEncoder pitchMotorEncoder = new AnalogEncoder(ArmMotorsConstants.PitchMotor.kPitchEncoderId);
@@ -33,19 +36,12 @@ public class PitchMotorSubsystem extends SubsystemBase {
 
         // make sure all of them have the same settings in case we grabbed one with
         // presets
-        pitchMotor.restoreFactoryDefaults();
-
+        SparkMaxConfig config = new SparkMaxConfig();
+            config.smartCurrentLimit(35);
+            config.idleMode(IdleMode.kBrake);
+        pitchMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         constantAim = false;
 
-        // sets their constants
-        pitchMotor.setIdleMode(com.revrobotics.CANSparkBase.IdleMode.kBrake);
-        pitchMotor.setSmartCurrentLimit(39);
-
-        pitchMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) PitchMotor.kPitchEncoderReverseLimit);
-        pitchMotor.setSoftLimit(SoftLimitDirection.kForward, (float) PitchMotor.kPitchEncoderForwardLimit);
-
-        pitchMotorEncoder.setDistancePerRotation(360);
-        pitchMotor.getEncoder().setPositionConversionFactor(PitchMotor.kPitchInternalEncoderConversionFactor); // -44.44444...
         pitchMotor.getEncoder().setPosition(getEncoderDeg());
 
         /* Shuffleboard */
@@ -69,8 +65,8 @@ public class PitchMotorSubsystem extends SubsystemBase {
         /* Shuffleboard */
 
         // `getAbsolutePosition()` is the *absolute* position of the encoder, no
-        // rollovers, no offset.
-        encoderVoltage.setDouble(pitchMotorEncoder.getAbsolutePosition());
+        // rollovers, no offset we multiply by 360 to convert from rotations to degrees
+        encoderVoltage.setDouble(pitchMotorEncoder.get() * 360);
         // `getDistance()` is the position of the encoder scaled by the distance per
         // rotation, and does have rollovers.
         encoderDeg.setDouble(getEncoderDeg());
@@ -137,15 +133,9 @@ public class PitchMotorSubsystem extends SubsystemBase {
      * @return the encoder's rotation
      */
     public double getEncoderDeg() {
-        return (pitchMotorEncoder.getDistance() + PitchMotor.kPitchEncoderOffset);
+        return (pitchMotorEncoder.get() * 360 + PitchMotor.kPitchEncoderOffset);
     }
 
-    /**
-     * Resets the position of the <i>external, absolute</i> encoder
-     */
-    public void resetEncoder() {
-        pitchMotorEncoder.reset();
-    }
 
     /**
      * Uses a PID Controller to move the arm (in the pitch way (up and down)) to a set angle

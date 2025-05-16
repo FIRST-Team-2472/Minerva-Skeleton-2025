@@ -1,28 +1,32 @@
 package frc.robot.subsystems.ArmSubsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmMotorsConstants.*;
 import frc.robot.Constants.SensorConstants;
 
 public class IntakeMotorSubsystem extends SubsystemBase {
-    private CANSparkMax pushMotor = new CANSparkMax(PushMotor.kPushMotorId, MotorType.kBrushless);
-    private CANSparkMax intakeTopMotor = new CANSparkMax(IntakeMotors.kTopIntakeMotorId, MotorType.kBrushless);
-    private CANSparkMax intakeBottomMotor = new CANSparkMax(IntakeMotors.kBottomIntakeMotorId, MotorType.kBrushless);
+    private SparkMax pushMotor = new SparkMax(PushMotor.kPushMotorId, MotorType.kBrushless);
+    private SparkMax intakeTopMotor = new SparkMax(IntakeMotors.kTopIntakeMotorId, MotorType.kBrushless);
+    private SparkMax intakeBottomMotor = new SparkMax(IntakeMotors.kBottomIntakeMotorId, MotorType.kBrushless);
     DigitalInput photoElectricSensor = new DigitalInput(SensorConstants.kPhotoElectricSensorID);
 
     public IntakeMotorSubsystem() {
 
         // make sure all of them have the same settings in case we grabbed one with presets
-        pushMotor.restoreFactoryDefaults();
-        intakeTopMotor.restoreFactoryDefaults();
-        intakeBottomMotor.restoreFactoryDefaults();
+        SparkMaxConfig config = new SparkMaxConfig();
+            config.smartCurrentLimit(35);
+            config.idleMode(IdleMode.kBrake);
 
-        intakeTopMotor.setIdleMode(com.revrobotics.CANSparkBase.IdleMode.kBrake);
-        intakeBottomMotor.setIdleMode(com.revrobotics.CANSparkBase.IdleMode.kBrake);
-        pushMotor.setIdleMode(com.revrobotics.CANSparkBase.IdleMode.kBrake);
+        pushMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        intakeTopMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        intakeBottomMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
