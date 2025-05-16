@@ -25,12 +25,12 @@ public class SwerveModule {
 
     private CANcoder absoluteEncoder;
     private final boolean absoluteEncoderReversed;
-    private final double absoluteEncoderoffset;
+    private final double absoluteEncoderOffset;
     private final PIDController turningPidController;
 
     public SwerveModule(int driveMotorId, int turningMotorId, boolean driveMotorReversed, boolean turningMotorReversed, 
-            int absoluteEncoderId, double absoluteEncoderoffset, boolean absoluteEncoderReversed){
-        this.absoluteEncoderoffset = absoluteEncoderoffset;
+            int absoluteEncoderId, double absoluteEncoderOffset, boolean absoluteEncoderReversed){
+        this.absoluteEncoderOffset = absoluteEncoderOffset;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
         
         absoluteEncoder = new CANcoder(absoluteEncoderId);
