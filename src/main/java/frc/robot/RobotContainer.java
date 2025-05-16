@@ -1,8 +1,5 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -111,29 +108,7 @@ public class RobotContainer {
     driverBoard.addCamera("Limelight Stream Shooter", "limelight_shooter", "mjpg:http://limelight-shooter.local:5800").withSize(4,4);
 
     //warning a name change will break auto paths because pathplanner will not update it
-    NamedCommands.registerCommand("runIntake", new IntakeNoteCmd(intakeMotorSubsystem, pitchMotorSubsystem, 0, 8));
-    NamedCommands.registerCommand("Shoot", new ShootNoteCmd(shootingMotorSubsystem, intakeMotorSubsystem, .9 ));
-    NamedCommands.registerCommand("autoShoot", new FastAutoAimCmd(pitchMotorSubsystem, swerveSubsystem, shootingMotorSubsystem, intakeMotorSubsystem));
-    NamedCommands.registerCommand("angle to speaker", new SetArmPitchCmd(pitchMotorSubsystem, Constants.ArmMotorsConstants.PitchMotor.kPitchMotorSpeakerPresetAngle));
-    NamedCommands.registerCommand("rotate to 270", new SwerveRotateToAngle(swerveSubsystem, CommandSequences.teamChangeAngle((270))));
-    NamedCommands.registerCommand("SetArm to intake", new SetArmPitchCmd(pitchMotorSubsystem, Constants.ArmMotorsConstants.PitchMotor.kPitchMotorIntakePresetAngle));
-    NamedCommands.registerCommand("reset heading", new ResetHeadingCmd(swerveSubsystem, 0));
-    NamedCommands.registerCommand("Set Heading 60", new ResetHeadingCmd(swerveSubsystem, 60));
-    NamedCommands.registerCommand("Set Heading -60", new ResetHeadingCmd(swerveSubsystem, -60));
-
-    AutoBuilder.configureHolonomic(
-            () -> swerveSubsystem.getPose(), // Robot pose supplier for auto (correct range -180-180)
-            swerveSubsystem ::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-            () -> swerveSubsystem.getChassisSpeedsRobotRelative(), // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            swerveSubsystem :: runModulesRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-            AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG,
-            () -> SwerveSubsystem.isOnRed(),
-              // Boolean supplier that controls when the path will be mirrored for the red alliance
-              // This will flip the path being followed to the red side of the field.
-              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-            swerveSubsystem // Reference to this subsystem to set requirements
-        );
+   
         System.out.println("team " + SwerveSubsystem.isOnRed());
   }
 
@@ -159,58 +134,6 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     System.out.println("Autos Begun");
-       
-      m_autoSelected = m_chooser.getSelected();
-
-      if(m_autoSelected == test)
-        return AutoBuilder.buildAuto("test");
-
-      if(m_autoSelected == SPtwoNtwoNone)
-        return AutoBuilder.buildAuto("SPtwoNtwoNone");
-
-      if(m_autoSelected == SpThreeNThreeNEight)
-        return AutoBuilder.buildAuto("SPthreeNthreeNeight");
-
-      if (m_autoSelected == SPtwoNtwo)
-        return AutoBuilder.buildAuto("SPtwoNtwo");
-
-      if(m_autoSelected == SPtwoNoneNtwoNthree)
-        return AutoBuilder.buildAuto("SPtwoNoneNtwoNthree");
-
-      if(m_autoSelected == SPtwoNthreeNtwoNoneNfour)
-        return AutoBuilder.buildAuto("SPtwoNthreeNtwoNoneNfour");
-      
-      if(m_autoSelected == SPtwoNoneNfour)
-        return AutoBuilder.buildAuto("SPtwoNoneNfour");
-      
-      if(m_autoSelected == SPtwoNtwoNfour)
-        return AutoBuilder.buildAuto("SPtwoNtwoNfour");
-
-      if(m_autoSelected == SPoneNoneNfourRSPone)
-        return AutoBuilder.buildAuto("SPoneNoneNfourRSPone");
-      
-      if(m_autoSelected == SPthreeNeightNseven)
-        return AutoBuilder.buildAuto("SPthreeNthreeNeightNseven");
-
-      if(m_autoSelected == SPthreeNfourNfive)
-        return AutoBuilder.buildAuto("SPthreeNfourNfive");
-
-      if(m_autoSelected == SPthreeNfiveNfour)
-        return AutoBuilder.buildAuto("SPthreeNfiveNfour");
-
-      if(m_autoSelected == SPthreeNthree)
-        return AutoBuilder.buildAuto("SPthreeNthree");
-
-      if(m_autoSelected == SPoneNone)
-        return AutoBuilder.buildAuto("SPoneNone");
-
-      if(m_autoSelected == SPthreeNeightNseven)
-        return AutoBuilder.buildAuto("SPthreeNeightNseven");
-
-      if(m_autoSelected == justShoot)
-        return new SequentialCommandGroup(
-          commandSequences.justShoot(swerveSubsystem, pitchMotorSubsystem, shootingMotorSubsystem, intakeMotorSubsystem)
-        );
 
     return null;
   }
