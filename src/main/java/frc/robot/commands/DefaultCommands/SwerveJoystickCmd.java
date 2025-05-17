@@ -48,7 +48,7 @@ public class SwerveJoystickCmd extends Command {
         // get joystick values
         double xInput = SwerveSubsystem.isOnRed() ? -xSpdFunction.get() : -xSpdFunction.get();
         double yInput = SwerveSubsystem.isOnRed() ? -ySpdFunction.get() : -ySpdFunction.get();
-        double turningSpeed = turningSpdFunction.get() / 2;
+        double turningSpeed = turningSpdFunction.get();
 
         double xSpeed;
         double ySpeed;

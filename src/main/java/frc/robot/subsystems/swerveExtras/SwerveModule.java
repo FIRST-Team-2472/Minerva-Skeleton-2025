@@ -82,7 +82,7 @@ public class SwerveModule {
     public double getAbsolutePosition() {
         // converts from (-.5, .5) to (-180, 180)
         double angle = 360 * absoluteEncoder.getAbsolutePosition().getValueAsDouble();
-        angle -= absoluteEncoderOffset;
+        //angle -= absoluteEncoderOffset;
         angle *= absoluteEncoderReversed ? -1 : 1;
         
         return angle;
@@ -95,7 +95,7 @@ public class SwerveModule {
     }
 
     public SwerveModuleState getState(){
-        return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getTurningPosition()));
+        return new SwerveModuleState(getDriveVelocity(), Rotation2d.fromDegrees(getAbsolutePosition()));
     }
 
     public void setDesiredState(SwerveModuleState state){

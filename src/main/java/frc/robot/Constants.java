@@ -85,7 +85,7 @@ public final class Constants {
     public static final double kBackRightDriveAbsoluteEncoderOffsetAng = 0.35;
     public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-    public static final double kPhysicalMaxSpeedMetersPerSecond = 18;
+    public static final double kPhysicalMaxSpeedMetersPerSecond = 3;
     public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 7 * 3 * Math.PI;
 
     public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond;
@@ -125,7 +125,7 @@ public final class Constants {
       public static final int kPitchMotorId = 58;
       public static final double kPitchMotorKP = 0.15;
       public static final int kPitchEncoderId = 0;
-      public static final double kPitchEncoderOffset = -264;
+      public static final double kPitchEncoderOffset = -274;
       public static final double kPitchInternalEncoderConversionFactor = -((4 / 9) * 100); // -44.4444...
       public static final double kPitchBaseIdleForce = 0.052;
       public static final double kPitchEncoderForwardLimit = 10;

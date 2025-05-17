@@ -227,11 +227,6 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void executeJoystickRunFromField(double xSpeedPercent, double ySpeedPercent, double thetaSpeedPercent) {
-        // 3. Make the driving smoother (limits acceleration)
-        xSpeedPercent = xLimiter.calculate(xSpeedPercent * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond);
-        ySpeedPercent = yLimiter.calculate(ySpeedPercent * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond);
-        thetaSpeedPercent = turningLimiter
-                .calculate(thetaSpeedPercent * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond);
 
         runModulesFieldRelative(xSpeedPercent, ySpeedPercent, thetaSpeedPercent);
     }
