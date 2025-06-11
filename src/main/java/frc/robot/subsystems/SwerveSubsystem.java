@@ -1,27 +1,16 @@
 package frc.robot.subsystems;
 
-import java.util.Optional;
-
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.hardware.Pigeon2;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -31,9 +20,10 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SensorConstants;
 import frc.robot.Constants.TargetPosConstants;
 import frc.robot.subsystems.swerveExtras.AccelerationLimiter;
-import frc.robot.subsystems.swerveExtras.LimelightHelpers;
 import frc.robot.subsystems.swerveExtras.SwerveModule;
-import frc.robot.subsystems.swerveExtras.LimelightHelpers.LimelightResults;
+import org.littletonrobotics.junction.Logger;
+
+import java.util.Optional;
 
 public class SwerveSubsystem extends SubsystemBase {
     private final SwerveModule frontLeft = new SwerveModule(//
@@ -337,28 +327,6 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("frontRight Encoder", getFRAbsEncoder());
         SmartDashboard.putNumber("BackLeft Encoder", getBLAbsEncoder());
         SmartDashboard.putNumber("BackRight Encoder", getBRAbsEncoder());
-
-        LimelightResults llr = LimelightHelpers.getLatestResults("limelight-shooter");
-        int fiducialCount = llr.targetingResults.targets_Fiducials.length;
-
-        if (!DriverStation.isAutonomous() && !camsDisabled && fiducialCount >= 2 && frontLeft.getDriveVelocity() < 0.2) { // Make sure there are at least 2 AprilTags in sight for accuracy
-            Pose2d botPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-shooter");
-
-            if(lastSeenPosition != null){
-
-                Rotation2d difference = lastSeenPosition.getRotation().minus(botPose.getRotation());
-
-                if(difference.getDegrees() < 2){
-                    resetOdometry(botPose);
-                }
-                    if(isOnRed())
-                        setHeading(botPose.getRotation().getDegrees()+180);
-                    else
-                        setHeading(botPose.getRotation().getDegrees());
-            }
-
-            lastSeenPosition = botPose;
-        }
 
         logOdometry();
         logPigeonState();

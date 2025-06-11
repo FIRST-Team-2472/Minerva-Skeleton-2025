@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -10,32 +9,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmMotorsConstants;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ConstantAimToggleCmd;
-import frc.robot.commands.FastAutoAimCmd;
-import frc.robot.commands.IntakeNoteCmd;
-import frc.robot.commands.OverrideCmd;
-import frc.robot.commands.ResetHeadingCmd;
-import frc.robot.commands.SetArmPitchCmd;
-import frc.robot.commands.SwerveRotateToAngle;
-import frc.robot.commands.ShootNoteCmd;
-import frc.robot.commands.SmallPnuematicsCmd;
-import frc.robot.commands.DefaultCommands.IntakeMotorCmd;
-import frc.robot.commands.DefaultCommands.PitchMotorCmd;
-import frc.robot.commands.DefaultCommands.PneumaticsCmd;
-import frc.robot.commands.DefaultCommands.ShooterMotorsCmd;
-import frc.robot.commands.DefaultCommands.SwerveJoystickCmd;
-import frc.robot.subsystems.PneumaticsSubsystem;
+import frc.robot.commands.*;
+import frc.robot.commands.DefaultCommands.*;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.ArmSubsystems.IntakeMotorSubsystem;
-import frc.robot.subsystems.ArmSubsystems.PitchMotorSubsystem;
-import frc.robot.subsystems.ArmSubsystems.ShootingMotorSubsystem;
 
 public class RobotContainer {
   private final String SPtwoNtwoNone = "3 notes in speaker Speaker 2 Note 2 - 1 - TESTED", SPtwoNtwo = "2 notes in speaker Seaker 2 Note 2 - TESTED",
@@ -52,12 +32,7 @@ public class RobotContainer {
 
   private final CommandSequences commandSequences = new CommandSequences();
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-  private final PneumaticsSubsystem pneumaticsSubsystem = new PneumaticsSubsystem();
 
-
-  private final IntakeMotorSubsystem intakeMotorSubsystem = new IntakeMotorSubsystem();
-  private final PitchMotorSubsystem pitchMotorSubsystem = new PitchMotorSubsystem();
-  private final ShootingMotorSubsystem shootingMotorSubsystem = new ShootingMotorSubsystem();
 
   //private final Limelights limelights = new Limelights(swerveSubsystem, armSubsystem);
   XboxController xbox = new XboxController(OperatorConstants.kXboxControllerPort);
@@ -67,19 +42,12 @@ public class RobotContainer {
   
 
   public RobotContainer() {
-    pitchMotorSubsystem.setDefaultCommand(new PitchMotorCmd(pitchMotorSubsystem, () -> xbox.getRightY(), () -> leftJoystick.getRawButton(1), () -> swerveSubsystem.getPose())); // Intake Motors
-    intakeMotorSubsystem.setDefaultCommand(new IntakeMotorCmd(intakeMotorSubsystem, () -> leftJoystick.getRawButton(1),
-    () -> xbox.getYButton()));
-    shootingMotorSubsystem.setDefaultCommand(new ShooterMotorsCmd(shootingMotorSubsystem, () -> xbox.getYButton(), () -> swerveSubsystem.getPose()));
-
     swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(swerveSubsystem, 
       ()-> xbox.getLeftY(),
       ()-> xbox.getLeftX(),
       ()-> -xbox.getRightX(),
       ()-> false
     ));
-
-    pneumaticsSubsystem.setDefaultCommand(new PneumaticsCmd(pneumaticsSubsystem));
     
     configureBindings();
 
@@ -114,22 +82,8 @@ public class RobotContainer {
 
   private void configureBindings() {
     new JoystickButton(rightJoystick, 4).onTrue(new InstantCommand(swerveSubsystem :: zeroHeading));
-    new JoystickButton(rightJoystick, 3).onTrue(new OverrideCmd(swerveSubsystem, intakeMotorSubsystem, pitchMotorSubsystem, shootingMotorSubsystem));
     new JoystickButton(rightJoystick, 13).onTrue(new InstantCommand(swerveSubsystem :: disableCams));
-    new JoystickButton(rightJoystick, 2).onTrue(new ShootNoteCmd(shootingMotorSubsystem, intakeMotorSubsystem, 0.9, 2000));
 
-    new CommandXboxController(OperatorConstants.kXboxControllerPort).leftBumper().onTrue(new SmallPnuematicsCmd(pneumaticsSubsystem));
-    new CommandXboxController(OperatorConstants.kXboxControllerPort).rightBumper().onTrue(new InstantCommand(pneumaticsSubsystem :: toggleBigpneumatics));
-
-    new CommandXboxController(OperatorConstants.kXboxControllerPort).a().onTrue(new SetArmPitchCmd(pitchMotorSubsystem, ArmMotorsConstants.PitchMotor.kPitchMotorIntakePresetAngle));
-    new CommandXboxController(OperatorConstants.kXboxControllerPort).b().onTrue(new SetArmPitchCmd(pitchMotorSubsystem, ArmMotorsConstants.PitchMotor.kPitchMotorSpeakerPresetAngle));
-    new CommandXboxController(OperatorConstants.kXboxControllerPort).x().onTrue(new SetArmPitchCmd(pitchMotorSubsystem, ArmMotorsConstants.PitchMotor.kPitchMotorAmpPresetAngle));
-
-    new CommandXboxController(OperatorConstants.kXboxControllerPort).rightTrigger(0.5).onTrue(new ShootNoteCmd(shootingMotorSubsystem, intakeMotorSubsystem, 0.9, 4000));
-    new CommandXboxController(OperatorConstants.kXboxControllerPort).leftTrigger(0.5).onTrue(new ShootNoteCmd(shootingMotorSubsystem, intakeMotorSubsystem, 0.4, 0));
-    //new CommandXboxController(OperatorConstants.kXboxControllerPort).y().onTrue(new SetArmPitchCmd(armSubsystem, ArmMotorsConstants.PitchMotor.kPitchMotorStandbyPresetAngle));
-    new CommandXboxController(OperatorConstants.kXboxControllerPort).start().onTrue(new FastAutoAimCmd(pitchMotorSubsystem, swerveSubsystem, shootingMotorSubsystem, intakeMotorSubsystem));
-    new CommandXboxController(OperatorConstants.kXboxControllerPort).back().onTrue(new ConstantAimToggleCmd(swerveSubsystem, pitchMotorSubsystem, shootingMotorSubsystem));
   }
 
   public Command getAutonomousCommand() {
@@ -146,7 +100,6 @@ public class RobotContainer {
     SmartDashboard.putNumber("frontRight Encoder", swerveSubsystem.getFRAbsEncoder());
     SmartDashboard.putNumber("BackLeft Encoder", swerveSubsystem.getBLAbsEncoder());
     SmartDashboard.putNumber("BackRight Encoder", swerveSubsystem.getBRAbsEncoder());
-    SmartDashboard.putNumber("Shooter speed", shootingMotorSubsystem.getShooterSpeed());
     SmartDashboard.putNumber("Rotation", swerveSubsystem.getRotation2d().getDegrees());
     //SmartDashboard.putNumber("Arm Encoder", armSubsystem.getAbsoluteEncoder());
   }

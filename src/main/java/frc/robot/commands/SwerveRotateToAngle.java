@@ -3,7 +3,6 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.AutoAiming;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class SwerveRotateToAngle extends Command {
@@ -31,8 +30,6 @@ public class SwerveRotateToAngle extends Command {
     swerveSubsystem.initializeRotateToAngle();
     timer.restart();
     override.restart();
-    if(autoAiming)
-      targetAngle =  Rotation2d.fromDegrees(AutoAiming.getYaw(swerveSubsystem.getPose()));
   }
 
   @Override

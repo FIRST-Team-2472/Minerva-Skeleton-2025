@@ -1,16 +1,15 @@
 package frc.robot.commands.DefaultCommands;
 
-import java.util.function.Supplier;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.AutoAiming;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.TargetPosConstants;
 import frc.robot.subsystems.SwerveSubsystem;
+
+import java.util.function.Supplier;
 
 public class SwerveJoystickCmd extends Command {
 
@@ -72,19 +71,9 @@ public class SwerveJoystickCmd extends Command {
                 ? (!slowed.get() ? ySpeed : ySpeed * OperatorConstants.kSlowedSpeed)
                 : 0.0;
 
-        if (swerveSubsystem.getConstantAim()
-                && AutoAiming.getSmartDistance(swerveSubsystem.getPose()) < OperatorConstants.autoAimDistance) {
 
-            Rotation2d angleDifference = swerveSubsystem.getPose().getRotation()
-                    .minus(Rotation2d.fromDegrees(AutoAiming.getYaw(swerveSubsystem.getPose())));
-            turningSpeed = MathUtil.clamp(turningController.calculate(angleDifference.getRadians(), 0), -1, 1)
-                    * TargetPosConstants.kMaxAngularSpeed / 2;
+        turningSpeed = Math.abs(turningSpeed) > OIConstants.kDeadband ? turningSpeed : 0.0;
 
-            // turningSpeed += Math.copySign(TargetPosConstants.kMinAngularSpeedRadians,
-            // turningSpeed);
-        } else {
-            turningSpeed = Math.abs(turningSpeed) > OIConstants.kDeadband ? turningSpeed : 0.0;
-        }
 
         swerveSubsystem.executeJoystickRunFromField(xSpeed, ySpeed, turningSpeed);
 
