@@ -69,6 +69,7 @@ public class SwerveModule {
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(getDrivePosition(), Rotation2d.fromDegrees(getAbsolutePosition()));
     }
+
     public double getAbsoluteEncoder(){ // this is used for shuffleboard
         return absoluteEncoder.getAbsolutePosition().getValueAsDouble();
     }
@@ -76,6 +77,7 @@ public class SwerveModule {
         double angle = absoluteEncoder.getAbsolutePosition().getValueAsDouble();
         return angle;
     }
+
     public double getAbsolutePosition() {
         // converts from (-.5, .5) to (-180, 180)
         double angle = 360 * absoluteEncoder.getAbsolutePosition().getValueAsDouble();

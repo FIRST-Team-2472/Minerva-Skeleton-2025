@@ -1,6 +1,11 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.hardware.DeviceIdentifier;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.jni.StatusSignalJNI;
+import com.ctre.phoenix6.spns.SpnValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -313,6 +318,21 @@ public class SwerveSubsystem extends SubsystemBase {
         setModuleStates(moduleStates);
     }
 
+    protected StatusSignalJNI jni = new StatusSignalJNI();
+
+    double getPigeonRaw(int spn) {
+        jni.network = gyro.getNetwork();
+        jni.deviceHash = (int) gyro.getDeviceHash();
+        jni.spn = spn;
+
+        int error = jni.JNI_RefreshSignal(0);
+        if (error != 0) {
+            System.out.println("getPigeonRaw Error");
+        }
+
+        return jni.value;
+    }
+
     @Override
     public void periodic() {
         odometer.update(getRotation2d(), getModulePositions());
@@ -327,6 +347,11 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("frontRight Encoder", getFRAbsEncoder());
         SmartDashboard.putNumber("BackLeft Encoder", getBLAbsEncoder());
         SmartDashboard.putNumber("BackRight Encoder", getBRAbsEncoder());
+
+        Logger.recordOutput("Pigeon/RawYaw", getPigeonRaw(SpnValue.Pigeon2Yaw.value));
+        Logger.recordOutput("Pigeon/RawPitch", getPigeonRaw(SpnValue.Pigeon2Pitch.value));
+        Logger.recordOutput("Pigeon/RawRoll", getPigeonRaw(SpnValue.Pigeon2Roll.value));
+        Logger.recordOutput("Pigeon/RawHeading", getPigeonRaw(SpnValue.Pigeon2AccumGyroZ.value));
 
         logOdometry();
         logPigeonState();
