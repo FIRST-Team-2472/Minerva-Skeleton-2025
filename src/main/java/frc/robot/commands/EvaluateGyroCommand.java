@@ -40,7 +40,6 @@ public class EvaluateGyroCommand extends Command {
         this.rotations = rotations;
         this.rotateBy = rotations * 360;
         this.swerveSubsystem = swerveSubsystem;
-        this.targetAngle = getCurrentGyroAngle() + rotateBy;
         this.totalTests = tests;
 
         addRequirements(swerveSubsystem);
@@ -59,6 +58,12 @@ public class EvaluateGyroCommand extends Command {
 
                 case STARTING:
                     this.initialCameraAngle = getCurrentCameraAngle();
+                    if ((testsDone % 2) == 0) {
+                        this.targetAngle = getCurrentGyroAngle() + rotateBy; // One way
+                    } else {
+                        this.targetAngle = getCurrentGyroAngle() - rotateBy; // then the other!
+                    }
+
                     this.stage = Stage.SPINNING;
                     break;
 
