@@ -51,7 +51,6 @@ public class RobotContainer {
 
         configureBindings();
 
-
         m_chooser.addOption(SPtwoNtwoNone, SPtwoNtwoNone);
         m_chooser.addOption(SPtwoNtwo, SPtwoNtwo);
         m_chooser.addOption(SPtwoNoneNtwoNthree, SPtwoNoneNtwoNthree);
@@ -68,7 +67,6 @@ public class RobotContainer {
         m_chooser.addOption(SpThreeNThreeNEight, SpThreeNThreeNEight);
         m_chooser.addOption(test, test);
         m_chooser.addOption(justShoot, justShoot);
-
 
         ShuffleboardTab driverBoard = Shuffleboard.getTab("Driver Board");
         driverBoard.add("Auto choices", m_chooser).withWidget(BuiltInWidgets.kComboBoxChooser);
@@ -89,7 +87,7 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         System.out.println("Autos Begun");
 
-        return null;
+        return new EvaluateGyroCommand(swerveSubsystem, 10, 1);
     }
 
     public void logSwerve() {

@@ -9,7 +9,6 @@ public class SwerveRotateToAngle extends Command {
   private SwerveSubsystem swerveSubsystem;
   private Rotation2d targetAngle;
   private Timer timer, override;
-  private boolean autoAiming;
 
   public SwerveRotateToAngle(SwerveSubsystem m_SwerveSubsystem, Rotation2d targetAngle) {
     this.swerveSubsystem = m_SwerveSubsystem;
@@ -22,7 +21,6 @@ public class SwerveRotateToAngle extends Command {
   }
   public SwerveRotateToAngle(SwerveSubsystem m_SwerveSubsystem) {
     this(m_SwerveSubsystem, new Rotation2d());
-    autoAiming = true;
   }
 
   @Override

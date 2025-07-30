@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.commands.SwerveRotateToAngle;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.swerveExtras.PosPose2d;
 import frc.robot.subsystems.swerveExtras.PositivePoint;
@@ -135,6 +136,7 @@ public class CommandSequences {
     public PosPose2d simplePose(double x, double y, double angleDegrees) {
         return new PosPose2d(x, y, Rotation2d.fromDegrees(angleDegrees));
     }
+
     public static Rotation2d teamChangeAngle(double degrees){
         if(SwerveSubsystem.isOnRed())
                 return  Rotation2d.fromDegrees(-degrees+180);

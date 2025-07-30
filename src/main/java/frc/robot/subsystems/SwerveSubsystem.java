@@ -73,7 +73,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public PIDController thetaController;
 
     private final Pigeon2 gyro = new Pigeon2(SensorConstants.kPigeonID);
-    private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics,
+    public final SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics,
             new Rotation2d(0), getModulePositions());
 
     private static final SendableChooser<String> colorChooser = new SendableChooser<>();
@@ -108,7 +108,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
         xController = new PIDController(TargetPosConstants.kPDriveController, 0, 0);
         yController = new PIDController(TargetPosConstants.kPDriveController, 0, 0);
-        thetaController = new PIDController(TargetPosConstants.kPAngleController, 0.08, 0.02);
+        thetaController = new PIDController(TargetPosConstants.kPAngleController, 0.0, 0.02);
 
         /*
          * Maybe the cause of the autonomous not working. When we call generate path in
@@ -285,15 +285,16 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void executeRotateToAngle(Rotation2d targetPosition) {
         Rotation2d angleDifference = odometer.getPoseMeters().getRotation().minus(targetPosition);
+
         double turningSpeed = MathUtil.clamp(thetaController.calculate(angleDifference.getRadians(),
                 0), -1, 1) * TargetPosConstants.kMaxAngularSpeed;
 
-        turningSpeed += Math.copySign(TargetPosConstants.kMinAngularSpeedRadians, turningSpeed);
+        // turningSpeed += Math.copySign(TargetPosConstants.kMinAngularSpeedRadians, turningSpeed);
 
         runModulesFieldRelative(0, 0, turningSpeed);
     }
 
-    private void runModulesFieldRelative(double xSpeed, double ySpeed, double turningSpeed) {
+    public void runModulesFieldRelative(double xSpeed, double ySpeed, double turningSpeed) {
         // Converts robot speeds to speeds relative to field
         this.chassisSpeeds = chassisSpeeds;
         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -305,6 +306,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // Output each module states to wheels
         setModuleStates(moduleStates);
     }
+
     public void runModulesRobotRelative(ChassisSpeeds chassisSpeeds) {
         // Converts robot speeds to speeds relative to field
         this.chassisSpeeds = chassisSpeeds;
@@ -320,7 +322,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     protected StatusSignalJNI jni = new StatusSignalJNI();
 
-    double getPigeonRaw(int spn) {
+    public double getPigeonRaw(int spn) {
         jni.network = gyro.getNetwork();
         jni.deviceHash = (int) gyro.getDeviceHash();
         jni.spn = spn;

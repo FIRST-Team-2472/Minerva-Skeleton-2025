@@ -11,7 +11,7 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kLeftJoyPort = 1;
     public static final int kRightJoyPort = 2;
-    public static final int kXboxControllerPort = 3;
+    public static final int kXboxControllerPort = 0;
     public static final double kSlowedSpeed = 0.3;
     public static final double autoAimDistance = 3.5;
   }
@@ -168,7 +168,7 @@ public final class Constants {
     public static final double kMinSpeedMetersPerSec = .2;
 
     public static final double kPDriveController = 1.9;
-    public static final double kPAngleController = 0.3;
+    public static final double kPAngleController = 0.2;
     public static final double kAcceptableDistanceError = 0.12;
     public static final double kAcceptableAngleError = 1.5;
 }
