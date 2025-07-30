@@ -79,14 +79,14 @@ public class EvaluateGyroCommand extends Command {
 
                     double degreesError = this.finalCameraAngle - this.initialCameraAngle;
                     System.out.println("Error reported by the camera is: " + degreesError + "°");
-                    System.out.println();
+                    System.out.println(); // TODO: Ensure the gyro and camera move the same direction
 
                     double knownError = this.targetAngle - this.finalGyroAngle;
                     System.out.println("But the gyro knows its off by:   " + knownError + "°");
                     System.out.println("This error can be assumed to be coming from the PID!");
                     System.out.println();
 
-                    degreesError -= knownError;
+                    degreesError -= knownError; // TODO make sure that this is `-`
                     System.out.println("So the real error is:            " + degreesError + "°");
                     System.out.println();
 
@@ -105,7 +105,7 @@ public class EvaluateGyroCommand extends Command {
                     double correctionRatio = 1.0 / angleRatio;
                     System.out.println("Multiply the zeroed heading by:  " + correctionRatio);
                     System.out.println("to correct this error");
-                    System.out.println("(if it is constant and linear)");
+                    System.out.println("(if the error is constant and linear)");
                     System.out.println();
 
                     System.out.println("+--------------------------------------------+");
