@@ -11,7 +11,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 
 public class EvaluateGyroCommand extends Command {
     private SwerveSubsystem swerveSubsystem;
-    private String limeLightName = "limelight-idk";
+    private String limeLightName = "limelight-side";
 
     private int rotations;                  // How many rotations to perform per test
     private double rotateBy;                // How many degrees we rotate by with each test
