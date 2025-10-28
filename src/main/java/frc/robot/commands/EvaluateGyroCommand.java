@@ -4,10 +4,12 @@ import com.ctre.phoenix6.spns.SpnValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.SwerveSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public class EvaluateGyroCommand extends Command {
     private SwerveSubsystem swerveSubsystem;
@@ -17,20 +19,21 @@ public class EvaluateGyroCommand extends Command {
     private double rotateBy;                // How many degrees we rotate by with each test
     private double targetAngle;             // Where we want to be at the end of a spin, updates with each test
     private double angleDifference;         // How many degrees we have left to go
+    private double pidOutput = 0.0;
 
     private boolean isDone = false;         // Are we done yet?
     private Stage stage = Stage.STARTING;   // Contains the current state of the state machine
 
     private int testsDone = 0;              // How many tests we have already completed
-    private int totalTests = 0;             // How many tests we need total
+    private int totalTests;                 // How many tests we need total
 
-    private PIDController rotationalPID = new PIDController(0.2, 0.0, 0.02);
+    private PIDController rotationalPID = new PIDController(0.3, 0.0, 0.001);
     private double maxRotationalVelocity = -Constants.TargetPosConstants.kMaxAngularSpeed;
 
     private double angularTolerance = 5;    // How many degrees off we call good enough
                                             // Should not affect measurement too much
                                             // as the Pigeon2 should still know if it's off
-    private double velocityTolerance = 0.01; // How slow should we be going before allowing us to stop
+    private double velocityTolerance = 0.05; // How slow should we be going before allowing us to stop
 
     private double initialCameraAngle = 0.0; // The angle the camera sees at the beginning of a test
     private double finalCameraAngle = 0.0;  // The angle the camera sees at the end of a test
@@ -71,6 +74,10 @@ public class EvaluateGyroCommand extends Command {
                     double turningSpeed = this.getTurningSpeed();
                     this.swerveSubsystem.runModulesFieldRelative(0, 0, turningSpeed);
 
+                    Logger.recordOutput("GyroEval/angleDifference", this.angleDifference);
+                    Logger.recordOutput("GyroEval/turningSpeed", turningSpeed);
+                    Logger.recordOutput("GyroEval/pidOutput", this.pidOutput);
+
                     if (this.isCloseEnough(this.angleDifference, turningSpeed)) {
                         this.swerveSubsystem.stopModules();
                         this.finalCameraAngle = this.getCurrentCameraAngle();
@@ -84,14 +91,14 @@ public class EvaluateGyroCommand extends Command {
 
                     double degreesError = this.finalCameraAngle - this.initialCameraAngle;
                     System.out.println("Error reported by the camera is: " + degreesError + "°");
-                    System.out.println(); // TODO: Ensure the gyro and camera move the same direction
+                    System.out.println();
 
                     double knownError = this.targetAngle - this.finalGyroAngle;
                     System.out.println("But the gyro knows its off by:   " + knownError + "°");
                     System.out.println("This error can be assumed to be coming from the PID!");
                     System.out.println();
 
-                    degreesError -= knownError; // TODO make sure that this is `-`
+                    degreesError += knownError;
                     System.out.println("So the real error is:            " + degreesError + "°");
                     System.out.println();
 
@@ -119,6 +126,7 @@ public class EvaluateGyroCommand extends Command {
 
                 case DONE:
                     this.testsDone++;
+                    this.stage = Stage.STARTING;
             }
             return;
         }
@@ -137,14 +145,15 @@ public class EvaluateGyroCommand extends Command {
     }
 
     private boolean isCloseEnough(double angle, double velocity) {
-        return (Math.abs(velocity) <= this.velocityTolerance) | (Math.abs(angle) <= this.angularTolerance);
+        return (Math.abs(velocity) <= this.velocityTolerance) && (Math.abs(angle) <= this.angularTolerance);
     }
 
     private double getTurningSpeed() {
         this.angleDifference = this.targetAngle - this.getCurrentGyroAngle();
         // System.out.println("Angle Error: " + angleDifference);
-        return MathUtil.clamp(this.rotationalPID.calculate(Math.toRadians(this.angleDifference),
-                0), -1, 1) * this.maxRotationalVelocity;
+        this.pidOutput = MathUtil.clamp(this.rotationalPID.calculate(Math.toRadians(this.angleDifference),
+                0), -1, 1);
+        return this.pidOutput * this.maxRotationalVelocity;
     }
 
     @Override
