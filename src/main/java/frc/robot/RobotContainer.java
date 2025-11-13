@@ -87,7 +87,7 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         System.out.println("Autos Begun");
 
-        return new EvaluateGyroCommand(swerveSubsystem, 1, 5);
+        return new EvaluateGyroCommand(swerveSubsystem, 5, 10);
     }
 
     public void logSwerve() {

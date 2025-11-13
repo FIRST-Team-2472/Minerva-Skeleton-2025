@@ -3,8 +3,10 @@ package frc.robot.commands;
 import com.ctre.phoenix6.spns.SpnValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
@@ -33,11 +35,13 @@ public class EvaluateGyroCommand extends Command {
     private double angularTolerance = 5;    // How many degrees off we call good enough
                                             // Should not affect measurement too much
                                             // as the Pigeon2 should still know if it's off
-    private double velocityTolerance = 0.05; // How slow should we be going before allowing us to stop
+    private double velocityTolerance = 0.1; // How slow should we be going before allowing us to stop
 
     private double initialCameraAngle = 0.0; // The angle the camera sees at the beginning of a test
     private double finalCameraAngle = 0.0;  // The angle the camera sees at the end of a test
     private double finalGyroAngle = 0.0;  // The
+
+    private Timer slowDownTimer = new Timer();
 
     public EvaluateGyroCommand(SwerveSubsystem swerveSubsystem, int rotations, int tests) {
         this.rotations = rotations;
@@ -60,6 +64,9 @@ public class EvaluateGyroCommand extends Command {
             switch (this.stage) {
 
                 case STARTING:
+                    this.slowDownTimer.stop();
+                    this.slowDownTimer.reset();
+
                     this.initialCameraAngle = getCurrentCameraAngle();
                     if ((testsDone % 2) == 0) {
                         this.targetAngle = getCurrentGyroAngle() + rotateBy; // One way
@@ -82,7 +89,11 @@ public class EvaluateGyroCommand extends Command {
                         this.swerveSubsystem.stopModules();
                         this.finalCameraAngle = this.getCurrentCameraAngle();
                         this.finalGyroAngle = this.getCurrentGyroAngle();
-                        this.stage = Stage.CALCULATING;
+                        this.slowDownTimer.start();
+
+                        if (this.slowDownTimer.advanceIfElapsed(5)) {
+                            this.stage = Stage.CALCULATING;
+                        }
                     }
                     break;
 
@@ -98,7 +109,7 @@ public class EvaluateGyroCommand extends Command {
                     System.out.println("This error can be assumed to be coming from the PID!");
                     System.out.println();
 
-                    degreesError += knownError;
+                    degreesError -= knownError;
                     System.out.println("So the real error is:            " + degreesError + "°");
                     System.out.println();
 
